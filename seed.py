@@ -104,7 +104,7 @@ with app.app_context():
             'price': 1799,
             'cost': 25,
             'stock': 20,
-            'image': '/static/images/products/ASUS-ROG-Strix-G18.png',
+            'image': '/static/images/products/asus-rog-strix-g18.png',
             'description': 'Gaming laptop with high refresh rate display, powerful GPU, and fast processor.'
         },
         {
