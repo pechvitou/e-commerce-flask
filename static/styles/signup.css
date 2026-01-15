@@ -122,7 +122,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: url('/static/stock_images/abstract bg.jpg') no-repeat center center;
+    background: url('/static/stock_images/abstract-bg.jpg') no-repeat center center;
     background-size: cover; /* makes image fill container */
     height: 100%;
     width: 100%;
