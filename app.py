@@ -50,6 +50,7 @@ jwt = JWTManager(app)
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#
 
 DATABASE_URL = os.getenv("DATABASE_URL")  # set this in your .env for local testing
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
