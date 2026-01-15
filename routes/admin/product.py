@@ -72,10 +72,15 @@ def product_create():
     # Handle image file
     image_file = files.get('image')
     if image_file:
+        # Get original filename
         filename = secure_filename(image_file.filename)
+        # Replace spaces with dashes
+        filename = filename.replace(' ', '-')
+        # Make it unique
         unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        # Save file
         image_file.save(f"{UPLOAD_FOLDER}/{unique_filename}")
-        image_filename = unique_filename
+        image_filename = f"/static/images/products/{unique_filename}"
     else:
         image_filename = None
 
@@ -145,7 +150,7 @@ def product_update(product_id):
         filename = secure_filename(image_file.filename)
         unique_filename = f"{uuid.uuid4().hex}_{filename}"
         image_file.save(f"{UPLOAD_FOLDER}/{unique_filename}")
-        p.image = unique_filename  # update image only if new file is uploaded
+        p.image = f"/static/images/products/{unique_filename}"
 
     # Update other fields
     p.name = name

@@ -1,0 +1,350 @@
+{% extends "/admin/admin_template.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block rightHeader %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin_product.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="product-page">
+
+        <!-- Header -->
+        <div class="product-header">
+            <h1>Product Management</h1>
+            <button class="btn-create" id="btnCreate">Add Product</button>
+        </div>
+
+        <!-- Add Form -->
+        <div class="product-form-container" id="productFormContainer">
+            <form id="productForm" enctype="multipart/form-data">
+                <div class="form-header">Add Product</div>
+                <div class="form-row">
+                    <label>Name</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-row">
+                    <label>Category</label>
+                    <select name="category_id" required>
+                        <option value="" disabled selected>Select a category</option>
+                        {% for cat in category %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Cost</label>
+                    <input type="number" step="0.01" name="cost" min="0" required>
+                </div>
+                <div class="form-row">
+                    <label>Price</label>
+                    <input type="number" step="0.01" name="price" min="0" required>
+                </div>
+                <div class="form-row">
+                    <label>Stock</label>
+                    <input type="number" step="1" name="stock" value="0" min="0">
+                </div>
+                <div class="form-row">
+                    <label>Description</label>
+                    <textarea name="description"></textarea>
+                </div>
+                <div class="form-row">
+                    <label>Image</label>
+                    <input type="file" name="image" accept="image/*">
+                </div>
+                <div class="form-row form-actions">
+                    <button type="button" class="btn-cancel" id="btnCancel">Cancel</button>
+                    <button type="submit" class="btn-submit">Add</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="product-form-container" id="editFormContainer">
+            <form id="editForm" enctype="multipart/form-data">
+                <div class="form-header">Edit Product</div>
+                <input type="hidden" name="product_id" id="edit_product_id">
+                <div class="form-row">
+                    <label>Name</label>
+                    <input type="text" name="name" id="edit_name" required>
+                </div>
+                <div class="form-row">
+                    <label>Category</label>
+                    <select name="category_id" id="edit_category_id" required>
+                        {% for cat in category %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Cost</label>
+                    <input type="number" step="0.01" name="cost" id="edit_cost" min="0" required>
+                </div>
+                <div class="form-row">
+                    <label>Price</label>
+                    <input type="number" step="0.01" name="price" id="edit_price" min="0" required>
+                </div>
+                <div class="form-row">
+                    <label>Stock</label>
+                    <input type="number" step="1" name="stock" id="edit_stock" min="0">
+                </div>
+                <div class="form-row">
+                    <label>Description</label>
+                    <textarea name="description" id="edit_description"></textarea>
+                </div>
+                <div class="form-row">
+                    <label>Image</label>
+                    <input type="file" name="image" id="edit_image" accept="image/*">
+                </div>
+                <div class="form-row form-actions">
+                    <button type="button" class="btn-cancel" id="btnEditCancel">Cancel</button>
+                    <button type="submit" class="btn-submit">Update</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="product-table-container">
+            <table class="product-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="productTableBody">
+                {% for product in products %}
+                    <tr data-id="{{ product.id }}"
+                        data-category="{{ product.category_id }}"
+                        data-cost="{{ product.cost }}"
+                        data-description="{{ product.description }}">
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.category_name }}</td>
+                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>
+                            <button class="btn-edit">Edit</button>
+                            <button class="btn-delete">Delete</button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align:center; color:#888;">No products found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="deleteConfirmModal" class="delete-modal">
+            <div class="delete-modal-content">
+                <p>Are you sure you want to delete this product?</p>
+                <div class="delete-modal-actions">
+                    <button id="deleteCancel" class="btn-cancel">Cancel</button>
+                    <button id="deleteConfirm" class="btn-submit delete">Delete</button>
+                </div>
+            </div>
+        </div>
+        <!-- Toast -->
+        <div id="vs-toast" class="vs-toast"></div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnCreate = document.getElementById('btnCreate');
+            const btnCancel = document.getElementById('btnCancel');
+            const btnEditCancel = document.getElementById('btnEditCancel');
+            const formContainer = document.getElementById('productFormContainer');
+            const editFormContainer = document.getElementById('editFormContainer');
+            const productForm = document.getElementById('productForm');
+            const editForm = document.getElementById('editForm');
+            const tableBody = document.getElementById('productTableBody');
+
+            // Show add form
+            btnCreate.addEventListener('click', () => {
+                formContainer.classList.add('fade-in-bottom');
+                formContainer.style.display = 'block';
+            });
+
+            // Hide forms
+            btnCancel.addEventListener('click', () => {
+                formContainer.style.display = 'none';
+                formContainer.classList.remove('fade-in-bottom');
+                productForm.reset();
+            });
+
+            btnEditCancel.addEventListener('click', () => {
+                editFormContainer.style.display = 'none';
+                editFormContainer.classList.remove('fade-in-bottom');
+                editForm.reset();
+            });
+
+            // ADD PRODUCT
+            productForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(productForm);
+
+                try {
+                    const response = await fetch('/product/create', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')}
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || 'Error creating product');
+
+                    const p = result.product;
+
+                    // Create a new row for the new product
+                    const row = document.createElement('tr');
+                    row.dataset.id = p.id;
+                    row.dataset.category = p.category_id;
+                    row.dataset.cost = p.cost;
+                    row.dataset.description = p.description;
+
+                    row.innerHTML = `
+                <td>${p.id}</td>
+                <td>${p.name}</td>
+                <td>${p.category_name || p.category_id}</td>
+                <td>$${p.price.toFixed(2)}</td>
+                <td>${parseInt(p.stock)}</td>
+                <td>
+                    <button class="btn-edit">Edit</button>
+                    <button class="btn-delete">Delete</button>
+                </td>
+            `;
+                    tableBody.prepend(row);
+
+                    showToast('Product created successfully!', 'success');
+                    btnCancel.click();
+
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            });
+
+            let deleteTargetRow = null; // store row to delete
+
+            const deleteModal = document.getElementById('deleteConfirmModal');
+            const deleteCancel = document.getElementById('deleteCancel');
+            const deleteConfirm = document.getElementById('deleteConfirm');
+
+            // EDIT & DELETE PRODUCT
+            tableBody.addEventListener('click', (e) => {
+                const tr = e.target.closest('tr');
+                if (!tr) return;
+
+                const id = tr.dataset.id;
+
+                // EDIT
+                if (e.target.classList.contains('btn-edit')) {
+                    document.getElementById('edit_product_id').value = id;
+                    document.getElementById('edit_name').value = tr.children[1].textContent;
+                    document.getElementById('edit_category_id').value = tr.dataset.category;
+                    document.getElementById('edit_cost').value = tr.dataset.cost;
+                    document.getElementById('edit_price').value = parseFloat(tr.children[3].textContent.replace('$', ''));
+                    document.getElementById('edit_stock').value = tr.children[4].textContent;
+                    document.getElementById('edit_description').value = tr.dataset.description;
+
+                    editFormContainer.classList.add('fade-in-bottom');
+                    editFormContainer.style.display = 'block';
+                }
+
+                // DELETE
+                if (e.target.classList.contains('btn-delete')) {
+                    deleteTargetRow = tr;
+                    deleteModal.style.display = 'flex';
+                }
+            });
+
+            deleteCancel.addEventListener('click', () => {
+                deleteModal.style.display = 'none';
+                deleteTargetRow = null;
+            });
+
+// Confirm delete
+            deleteConfirm.addEventListener('click', () => {
+                if (!deleteTargetRow) return;
+                const id = deleteTargetRow.dataset.id;
+
+                fetch(`/product/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: {'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')}
+                })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.error) showToast(res.error, 'error');
+                        else {
+                            deleteTargetRow.remove();
+                            showToast(res.message, 'success');
+                        }
+                        deleteModal.style.display = 'none';
+                        deleteTargetRow = null;
+                    })
+                    .catch(err => {
+                        showToast(err.message, 'error');
+                        deleteModal.style.display = 'none';
+                        deleteTargetRow = null;
+                    });
+            });
+
+            // UPDATE PRODUCT
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(editForm);
+                const id = formData.get('product_id');
+
+                try {
+                    const response = await fetch(`/product/update/${id}`, {
+                        method: 'PUT',
+                        body: formData,
+                        headers: {'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')}
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || 'Error updating product');
+
+                    const p = result.product;
+                    const row = tableBody.querySelector(`tr[data-id="${id}"]`);
+
+                    // Update row in place (keep its order)
+                    row.children[1].textContent = p.name;
+                    row.children[2].textContent = p.category_name || p.category_id;
+                    row.children[3].textContent = `$${p.price.toFixed(2)}`;
+                    row.children[4].textContent = parseInt(p.stock);
+                    row.children[5].innerHTML = `
+                <button class="btn-edit">Edit</button>
+                <button class="btn-delete">Delete</button>
+            `;
+
+                    // Update dataset attributes
+                    row.dataset.category = p.category_id;
+                    row.dataset.cost = p.cost;
+                    row.dataset.description = p.description;
+
+                    showToast('Product updated successfully!', 'success');
+                    btnEditCancel.click();
+
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            });
+
+        });
+
+        // Toast function
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById("vs-toast");
+            toast.textContent = message;
+            toast.style.backgroundColor = type === 'error' ? '#ef4444' : '#10b981';
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+    </script>
+
+{% endblock %}

@@ -10,6 +10,8 @@ from routes.front.login import *
 # from routes.front.signup import *
 from routes.front.dashboard import *
 from routes.front.admin import *
+from routes.front.admin_product import *
+from routes.front.admin_category import *
 
 # Backend
 from routes.admin.user import *

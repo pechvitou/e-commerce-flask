@@ -6,7 +6,7 @@ class Product(db.Model):
     cost = db.Column(db.Numeric(10, 2), nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     image = db.Column(db.String(255), nullable=True)
-    stock = db.Column(db.Numeric(10, 2), default=0, nullable=False)
+    stock = db.Column(db.Integer, default=0, nullable=False)
     description = db.Column(db.String(128))
 
     # Relationships

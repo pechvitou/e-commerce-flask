@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin_template.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    {% block rightHeader %}{% endblock %}
+</head>
+<body>
+<div class="admin-wrapper">
+
+    <!-- Sidebar / Appbar -->
+    <aside class="admin-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-header-profile">
+                <div class="sidebar-header-image">
+                </div>
+                <div class="sidebar-header-name">
+                    <h2>Admin</h2>
+                    <span>admin@gmail.com</span>
+                </div>
+            </div>
+            <button class="menu-toggle" id="menuToggle">&#9776;</button>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <ul>
+                <li class="store-btn" onclick="window.location.href='{{ url_for('home') }}'" style="cursor:pointer;">
+                    <svg width="22" height="22">
+                        <use href="/static/svg/sprite.svg#icon-home-v3"></use>
+                    </svg>
+                    <span>Viti's Store</span>
+                </li>
+                <li>
+                    <svg width="22" height="22">
+                        <use href="/static/svg/sprite.svg#icon-order-doc-v2"></use>
+                    </svg>
+                    <span>Order Management</span>
+                </li>
+                <li class="sidebar-item {% if request.path == url_for('admin_product') %}active{% endif %}"
+                    onclick="window.location.href='{{ url_for('admin_product') }}'">
+                    <svg width="22" height="22">
+                        <use href="/static/svg/sprite.svg#icon-box"></use>
+                    </svg>
+                    <span>Product Management</span>
+                </li>
+
+                <li class="sidebar-item {% if request.path == url_for('admin_category') %}active{% endif %}"
+                    onclick="window.location.href='{{ url_for('admin_category') }}'">
+                    <svg width="22" height="22">
+                        <use href="/static/svg/sprite.svg#icon-category-v2"></use>
+                    </svg>
+                    <span>Category Management</span>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <p class="logout-btn">Logout</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+<script>
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebarNav = document.getElementById('sidebarNav');
+
+    menuToggle.addEventListener('click', () => {
+        sidebarNav.classList.toggle('open');
+    });
+</script>
+</body>
+</html>

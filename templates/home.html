@@ -164,15 +164,6 @@
     <script>
 
         // Function to get total cart count
-        {#function updateCartCount() {#}
-        {#    const carts = JSON.parse(localStorage.getItem('carts')) || [];#}
-        {#    const totalCount = carts.length;#}
-        {#    const countElement = document.getElementById('cart-count');#}
-        {#    if (countElement) {#}
-        {#        countElement.textContent = totalCount;#}
-        {#    }#}
-        {#}#}
-
         function updateCartCount() {
             const carts = JSON.parse(localStorage.getItem('carts')) || [];
             const totalCount = carts.reduce((acc, p) => acc + p.quantity, 0);
@@ -195,7 +186,6 @@
                 toast.classList.remove("show");
             }, 3000);
         }
-
 
         const cartButtons = document.querySelectorAll(".vs-cart");
 
