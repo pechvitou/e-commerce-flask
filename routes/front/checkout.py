@@ -1,10 +1,12 @@
 import requests
-from app import app
+from app import app, db
 from flask import render_template, request, redirect, url_for, session
 from flask_mail import Mail, Message
 import json
 from dotenv import load_dotenv
 import os
+
+from model import Product, Order, OrderItem
 
 load_dotenv()
 
@@ -109,11 +111,9 @@ def send_order_notification(name, email, phone, address, cart, total_usd, total_
     except Exception as e:
         print("Email error:", e)
 
-
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if request.method == 'POST':
-        # Handle form submission
         name = request.form.get('name')
         email = request.form.get('email')
         phone = request.form.get('phone')
@@ -122,10 +122,56 @@ def checkout():
         cart_json = request.form.get('cart')
         cart = json.loads(cart_json) if cart_json else []
 
+        # Calculate totals
         total_usd = sum(item['price'] * item['quantity'] for item in cart)
         total_riel = total_usd * EXCHANGE_RATE
 
-        # Store invoice in session
+        # ---------------------------------------------------
+        # 1. Create Order
+        # ---------------------------------------------------
+        order = Order(
+            user_id=1,       # change if you have login system
+            customer_id=1,   # change to actual customer
+            status='pending'
+        )
+
+        db.session.add(order)
+        db.session.flush()  # <-- get order.id before commit
+
+        # ---------------------------------------------------
+        # 2. Create Order Items
+        # ---------------------------------------------------
+        for item in cart:
+            product = Product.query.get(item['id'])
+
+            if not product:
+                continue
+
+            qty = int(item['quantity'])
+            price = float(item['price'])
+            total = price * qty
+
+            order_item = OrderItem(
+                order_id=order.id,
+                product_id=product.id,
+                price=price,
+                qty=qty,
+                total=total
+            )
+
+            db.session.add(order_item)
+
+            # Optional: reduce stock
+            product.stock = product.stock - qty
+
+        # ---------------------------------------------------
+        # 3. Save to database
+        # ---------------------------------------------------
+        db.session.commit()
+
+        # ---------------------------------------------------
+        # 4. Store invoice in session
+        # ---------------------------------------------------
         session['invoice'] = {
             "name": name,
             "email": email,
@@ -133,10 +179,10 @@ def checkout():
             "address": address,
             "cart": cart,
             "total_usd": total_usd,
-            "total_riel": total_riel
+            "total_riel": total_riel,
+            "order_id": order.id
         }
 
-        # Send notifications
         send_order_notification(name, email, phone, address, cart, total_usd, total_riel)
 
         return redirect(url_for('invoice'))
