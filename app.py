@@ -21,6 +21,10 @@ from flask_jwt_extended import JWTManager
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "super-secret-key")
 
+for key in ["SECRET_KEY", "JWT_SECRET_KEY", "DATABASE_URL"]:
+    if not os.getenv(key):
+        raise RuntimeError(f"{key} is missing in environment")
+
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token"
