@@ -89,5 +89,5 @@ def handle_bad_token(*args, **kwargs):
 #     response.headers["Expires"] = "0"
 #     return response
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)
