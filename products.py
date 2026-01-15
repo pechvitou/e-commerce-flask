@@ -59,7 +59,7 @@
 #         'id': 9,
 #         'name': 'ASUS ROG Strix G18',
 #         'price': 39,
-#         'image_url': '/static/images/products/ASUS-ROG -Strix-G18.png',
+#         'image_url': '/static/images/products/ASUS-ROG-Strix-G18.png',
 #         'description': 'Gaming laptop with high refresh rate display, powerful GPU, and fast processor.'
 #     },
 #     {
