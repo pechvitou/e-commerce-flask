@@ -56,7 +56,7 @@ with app.app_context():
             'price': 299,
             'cost': 15,
             'stock': 40,
-            'image': '/static/images/products/pixel watch.png',
+            'image': '/static/images/products/pixel-watch.png',
             'description': 'Smartwatch with fitness tracking, heart rate monitor, and stylish design.'
         },
         {
@@ -64,7 +64,7 @@ with app.app_context():
             'price': 999,
             'cost': 35,
             'stock': 60,
-            'image': '/static/images/products/iPhone 17 Pro.png',
+            'image': '/static/images/products/iPhone-17-Pro.png',
             'description': 'Latest iPhone with advanced camera, fast processor, and sleek display.'
         },
         {
@@ -72,7 +72,7 @@ with app.app_context():
             'price': 999,
             'cost': 50,
             'stock': 30,
-            'image': '/static/images/products/samsung galaxy s25 ultra.png',
+            'image': '/static/images/products/samsung-galaxy-s25-ultra.png',
             'description': 'Premium Samsung smartphone with large screen, high-resolution camera, and fast performance.'
         },
         {
@@ -80,7 +80,7 @@ with app.app_context():
             'price': 799,
             'cost': 20,
             'stock': 50,
-            'image': '/static/images/products/iPhone 15.png',
+            'image': '/static/images/products/iPhone-15.png',
             'description': 'Compact and powerful iPhone with excellent performance and camera quality.'
         },
         {
@@ -88,7 +88,7 @@ with app.app_context():
             'price': 599,
             'cost': 60,
             'stock': 25,
-            'image': '/static/images/products/iPad Air 5th Gen.png',
+            'image': '/static/images/products/iPad-Air-5th-Gen.png',
             'description': 'Lightweight iPad with powerful chip, high-resolution display, and perfect for work or play.'
         },
         {
@@ -96,7 +96,7 @@ with app.app_context():
             'price': 299,
             'cost': 30,
             'stock': 40,
-            'image': '/static/images/products/Huawei Matepad Air.png',
+            'image': '/static/images/products/Huawei-Matepad-Air.png',
             'description': 'Versatile tablet with crisp display, long battery life, and solid performance.'
         },
         {
@@ -104,7 +104,7 @@ with app.app_context():
             'price': 1799,
             'cost': 25,
             'stock': 20,
-            'image': '/static/images/products/ASUS ROG Strix G18.png',
+            'image': '/static/images/products/ASUS-ROG -Strix-G18.png',
             'description': 'Gaming laptop with high refresh rate display, powerful GPU, and fast processor.'
         },
         {
@@ -112,7 +112,7 @@ with app.app_context():
             'price': 3499,
             'cost': 40,
             'stock': 15,
-            'image': '/static/images/products/Apple Vision Pro.png',
+            'image': '/static/images/products/Apple-Vision-Pro.png',
             'description': 'Cutting-edge AR headset with immersive display and intuitive controls for next-level experiences.'
         }
     ]
