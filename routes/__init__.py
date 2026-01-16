@@ -12,6 +12,7 @@ from routes.front.dashboard import *
 from routes.front.admin import *
 from routes.front.admin_product import *
 from routes.front.admin_category import *
+from routes.front.admin_order import *
 
 # Backend
 from routes.admin.user import *

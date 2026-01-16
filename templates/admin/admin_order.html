@@ -1,10 +1,161 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "/admin/admin_template.html" %}
 
-</body>
-</html>
+{% block title %}Admin Orders{% endblock %}
+
+{% block rightHeader %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin_order.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="order-page">
+
+        <div class="order-header">
+            <h1>Order Management</h1>
+        </div>
+
+        <div class="order-table-container">
+            <table class="order-table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date / Time</th>
+                    <th>Status</th>
+                    <th>Items</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for order in orders %}
+                    <tr data-id="{{ order.id }}">
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.date_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                        <span class="status {{ order.status }}">
+                            {{ order.status }}
+                        </span>
+                        </td>
+                        <td>
+                            <ul class="order-items">
+                                {% for item in order.items %}
+                                    <li>
+                                        <strong>{{ item.product.name }}</strong>
+                                        × {{ item.qty }}
+                                        — ${{ "%.2f"|format(item.price) }}
+                                        = <b>${{ "%.2f"|format(item.total) }}</b>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <button class="btn-edit">Update Status</button>
+                            <button class="btn-delete">Delete</button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="empty">No orders found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- STATUS MODAL -->
+    <div class="modal-backdrop" id="statusModal">
+        <div class="modal">
+            <h3>Update Order Status</h3>
+            <select id="statusSelect">
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="statusCancel">Cancel</button>
+                <button class="btn-submit" id="statusSave">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div class="modal-backdrop" id="deleteModal">
+        <div class="modal">
+            <h3>Delete Order</h3>
+            <p>Are you sure you want to delete this order?</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="deleteCancel">Cancel</button>
+                <button class="btn-delete-confirm" id="deleteConfirm">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedOrderId = null;
+        let selectedRow = null;
+
+        // OPEN MODALS
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', e => {
+                selectedRow = e.target.closest('tr');
+                selectedOrderId = selectedRow.dataset.id;
+
+                const currentStatus = selectedRow.querySelector('.status').textContent.trim();
+                document.getElementById('statusSelect').value = currentStatus;
+
+                document.getElementById('statusModal').style.display = 'flex';
+            });
+        });
+
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', e => {
+                selectedRow = e.target.closest('tr');
+                selectedOrderId = selectedRow.dataset.id;
+                document.getElementById('deleteModal').style.display = 'flex';
+            });
+        });
+
+        // CLOSE MODALS
+        document.getElementById('statusCancel').onclick = () =>
+            document.getElementById('statusModal').style.display = 'none';
+
+        document.getElementById('deleteCancel').onclick = () =>
+            document.getElementById('deleteModal').style.display = 'none';
+
+        // UPDATE STATUS
+        document.getElementById('statusSave').onclick = async () => {
+            const status = document.getElementById('statusSelect').value;
+
+            const res = await fetch(`/admin/order/update-status/${selectedOrderId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')
+                },
+                body: JSON.stringify({status})
+            });
+
+            if (res.ok) {
+                const badge = selectedRow.querySelector('.status');
+                badge.textContent = status;
+                badge.className = `status ${status}`;
+            }
+
+            document.getElementById('statusModal').style.display = 'none';
+        };
+
+        // DELETE ORDER
+        document.getElementById('deleteConfirm').onclick = async () => {
+            const res = await fetch(`/admin/order/delete/${selectedOrderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')
+                }
+            });
+
+            if (res.ok) selectedRow.remove();
+            document.getElementById('deleteModal').style.display = 'none';
+        };
+    </script>
+
+{% endblock %}

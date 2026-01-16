@@ -32,7 +32,8 @@
                     </svg>
                     <span>Viti's Store</span>
                 </li>
-                <li>
+                <li class="sidebar-item {% if request.path == url_for('admin_order') %}active{% endif %}"
+                    onclick="window.location.href='{{ url_for('admin_order') }}'">
                     <svg width="22" height="22">
                         <use href="/static/svg/sprite.svg#icon-order-doc-v2"></use>
                     </svg>
