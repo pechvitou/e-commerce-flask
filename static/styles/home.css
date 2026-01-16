@@ -286,9 +286,12 @@ body {
 }
 
 .vs-product-card img {
+
     width: 70%;
     max-width: 220px;
     height: auto;
+        /*max-width: 300px;*/
+    max-height: 190px;
     object-fit: contain;
 }
 

@@ -16,91 +16,95 @@
         </div>
 
         <!-- Add Form -->
-        <div class="product-form-container" id="productFormContainer">
-            <form id="productForm" enctype="multipart/form-data">
-                <div class="form-header">Add Product</div>
-                <div class="form-row">
-                    <label>Name</label>
-                    <input type="text" name="name" required>
-                </div>
-                <div class="form-row">
-                    <label>Category</label>
-                    <select name="category_id" required>
-                        <option value="" disabled selected>Select a category</option>
-                        {% for cat in category %}
-                            <option value="{{ cat.id }}">{{ cat.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-row">
-                    <label>Cost</label>
-                    <input type="number" step="0.01" name="cost" min="0" required>
-                </div>
-                <div class="form-row">
-                    <label>Price</label>
-                    <input type="number" step="0.01" name="price" min="0" required>
-                </div>
-                <div class="form-row">
-                    <label>Stock</label>
-                    <input type="number" step="1" name="stock" value="0" min="0">
-                </div>
-                <div class="form-row">
-                    <label>Description</label>
-                    <textarea name="description"></textarea>
-                </div>
-                <div class="form-row">
-                    <label>Image</label>
-                    <input type="file" name="image" accept="image/*">
-                </div>
-                <div class="form-row form-actions">
-                    <button type="button" class="btn-cancel" id="btnCancel">Cancel</button>
-                    <button type="submit" class="btn-submit">Add</button>
-                </div>
-            </form>
+        <div class="backdrop" id="addModalContainer">
+            <div class="product-form-container" id="productFormContainer">
+                <form id="productForm" enctype="multipart/form-data">
+                    <div class="form-header">Add Product</div>
+                    <div class="form-row">
+                        <label>Name</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Category</label>
+                        <select name="category_id" required>
+                            <option value="" disabled selected>Select a category</option>
+                            {% for cat in category %}
+                                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Cost</label>
+                        <input type="number" step="0.01" name="cost" min="0" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Price</label>
+                        <input type="number" step="0.01" name="price" min="0" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Stock</label>
+                        <input type="number" step="1" name="stock" value="0" min="0">
+                    </div>
+                    <div class="form-row">
+                        <label>Description</label>
+                        <textarea name="description"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <label>Image</label>
+                        <input type="file" name="image" accept="image/*">
+                    </div>
+                    <div class="form-row form-actions">
+                        <button type="button" class="btn-cancel" id="btnCancel">Cancel</button>
+                        <button type="submit" class="btn-submit">Add</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <!-- Edit Form -->
-        <div class="product-form-container" id="editFormContainer">
-            <form id="editForm" enctype="multipart/form-data">
-                <div class="form-header">Edit Product</div>
-                <input type="hidden" name="product_id" id="edit_product_id">
-                <div class="form-row">
-                    <label>Name</label>
-                    <input type="text" name="name" id="edit_name" required>
-                </div>
-                <div class="form-row">
-                    <label>Category</label>
-                    <select name="category_id" id="edit_category_id" required>
-                        {% for cat in category %}
-                            <option value="{{ cat.id }}">{{ cat.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-row">
-                    <label>Cost</label>
-                    <input type="number" step="0.01" name="cost" id="edit_cost" min="0" required>
-                </div>
-                <div class="form-row">
-                    <label>Price</label>
-                    <input type="number" step="0.01" name="price" id="edit_price" min="0" required>
-                </div>
-                <div class="form-row">
-                    <label>Stock</label>
-                    <input type="number" step="1" name="stock" id="edit_stock" min="0">
-                </div>
-                <div class="form-row">
-                    <label>Description</label>
-                    <textarea name="description" id="edit_description"></textarea>
-                </div>
-                <div class="form-row">
-                    <label>Image</label>
-                    <input type="file" name="image" id="edit_image" accept="image/*">
-                </div>
-                <div class="form-row form-actions">
-                    <button type="button" class="btn-cancel" id="btnEditCancel">Cancel</button>
-                    <button type="submit" class="btn-submit">Update</button>
-                </div>
-            </form>
+        <div class="backdrop" id="editModalContainer">
+            <div class="product-form-container" id="editFormContainer">
+                <form id="editForm" enctype="multipart/form-data">
+                    <div class="form-header">Edit Product</div>
+                    <input type="hidden" name="product_id" id="edit_product_id">
+                    <div class="form-row">
+                        <label>Name</label>
+                        <input type="text" name="name" id="edit_name" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Category</label>
+                        <select name="category_id" id="edit_category_id" required>
+                            {% for cat in category %}
+                                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Cost</label>
+                        <input type="number" step="0.01" name="cost" id="edit_cost" min="0" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Price</label>
+                        <input type="number" step="0.01" name="price" id="edit_price" min="0" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Stock</label>
+                        <input type="number" step="1" name="stock" id="edit_stock" min="0">
+                    </div>
+                    <div class="form-row">
+                        <label>Description</label>
+                        <textarea name="description" id="edit_description"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <label>Image</label>
+                        <input type="file" name="image" id="edit_image" accept="image/*">
+                    </div>
+                    <div class="form-row form-actions">
+                        <button type="button" class="btn-cancel" id="btnEditCancel">Cancel</button>
+                        <button type="submit" class="btn-submit">Update</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <!-- Table -->
@@ -170,17 +174,20 @@
             btnCreate.addEventListener('click', () => {
                 formContainer.classList.add('fade-in-bottom');
                 formContainer.style.display = 'block';
+                addModalContainer.style.display = 'flex';
             });
 
             // Hide forms
             btnCancel.addEventListener('click', () => {
                 formContainer.style.display = 'none';
+                addModalContainer.style.display = 'none';
                 formContainer.classList.remove('fade-in-bottom');
                 productForm.reset();
             });
 
             btnEditCancel.addEventListener('click', () => {
                 editFormContainer.style.display = 'none';
+                editModalContainer.style.display = 'none';
                 editFormContainer.classList.remove('fade-in-bottom');
                 editForm.reset();
             });
@@ -254,6 +261,9 @@
 
                     editFormContainer.classList.add('fade-in-bottom');
                     editFormContainer.style.display = 'block';
+
+                    {#editModalContainer.classList.add('fade-in-bottom');#}
+                    editModalContainer.style.display = 'flex';
                 }
 
                 // DELETE
@@ -268,7 +278,7 @@
                 deleteTargetRow = null;
             });
 
-// Confirm delete
+            // Confirm delete
             deleteConfirm.addEventListener('click', () => {
                 if (!deleteTargetRow) return;
                 const id = deleteTargetRow.dataset.id;

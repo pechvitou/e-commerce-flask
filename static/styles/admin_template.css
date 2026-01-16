@@ -96,7 +96,7 @@ body, html {
 
 .sidebar-nav ul li {
     padding: 5px 10px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -140,9 +140,12 @@ body, html {
 
 /* Main content */
 .admin-main {
-    flex: 1;
+    /*flex: 1;*/
+    width: 100%;
     padding: 2rem;
     background-color: #f3f4f6;
+    height: 100dvh;
+    overflow-y: auto;
 }
 
 .admin-main h1 {
