@@ -57,7 +57,9 @@
             </ul>
         </nav>
         <div class="sidebar-footer">
-            <p class="logout-btn">Logout</p>
+            <form action="{{ url_for('logout') }}" method="POST">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
         </div>
     </aside>
 

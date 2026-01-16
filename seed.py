@@ -1,8 +1,11 @@
+import os
+
 from app import app, db
 from model import User, Customer, Product, Category, Order, OrderItem
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 import random
+import base64
 
 with app.app_context():
     db.drop_all()
@@ -116,6 +119,17 @@ with app.app_context():
             'description': 'Cutting-edge AR headset with immersive display and intuitive controls for next-level experiences.'
         }
     ]
+
+    for p in product_list:
+        image_path = p['image'].lstrip('/')  # remove leading slash
+        if os.path.exists(image_path):
+            with open(image_path, "rb") as f:
+                image_bytes = f.read()
+                ext = os.path.splitext(image_path)[1][1:]  # get file extension without dot
+                p['image'] = f"data:image/{ext};base64,{base64.b64encode(image_bytes).decode('utf-8')}"
+        else:
+            print(f"Warning: {image_path} not found. Skipping image conversion.")
+            p['image'] = None
 
     products = [
         Product(
