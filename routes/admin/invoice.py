@@ -2,11 +2,8 @@ from flask_jwt_extended import jwt_required
 
 from app import app, db
 from model import Order, OrderItem, Customer, Product, User
-from flask import request, jsonify, redirect, session, url_for, render_template
+from flask import request, jsonify
 from datetime import datetime
-
-from routes import EXCHANGE_RATE
-
 
 @app.get('/invoice/list')
 @jwt_required()
@@ -39,28 +36,6 @@ def invoice_list():
         return jsonify({"error": "Server error", "details": str(e)}), 500
 
 
-@app.route('/invoice')
-def invoice():
-    order_id = session.get('invoice_order_id')
-    if not order_id:
-        return redirect(url_for('checkout'))
-
-    order = Order.query.get(order_id)
-    if not order:
-        return redirect(url_for('checkout'))
-
-    items = OrderItem.query.filter_by(order_id=order_id).all()
-
-    total_usd = sum(item.total for item in items)
-    total_riel = total_usd * EXCHANGE_RATE
-
-    return render_template(
-        'invoice.html',
-        order=order,
-        items=items,
-        total_usd=total_usd,
-        total_riel=total_riel
-    )
 
 @app.get('/invoice/<int:invoice_id>')
 @jwt_required()
