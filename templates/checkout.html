@@ -107,8 +107,8 @@
                         {#btn.style.cursor = 'pointer';#}
                     }
                 } catch (err) {
-                    localStorage.removeItem('carts');
-                    window.location.href = '/invoice';
+                    {#localStorage.removeItem('carts');#}
+                    {#window.location.href = '/invoice';#}
                     {#console.error(err);#}
                     {#alert(err.message);#}
                     {#btn.disabled = false;#}
