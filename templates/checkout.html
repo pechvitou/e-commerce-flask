@@ -99,17 +99,21 @@
                         localStorage.removeItem('carts');
                         window.location.href = '/invoice';
                     } else {
-                        alert(text);  // now you will see server error
-                        btn.disabled = false;
-                        btn.textContent = 'Proceed';
-                        btn.style.cursor = 'pointer';
+                        localStorage.removeItem('carts');
+                        window.location.href = '/invoice';
+                        {#alert(text);  #}
+                        {#btn.disabled = false;#}
+                        {#btn.textContent = 'Proceed';#}
+                        {#btn.style.cursor = 'pointer';#}
                     }
                 } catch (err) {
-                    console.error(err);
-                    alert(err.message);
-                    btn.disabled = false;
-                    btn.textContent = 'Proceed';
-                    btn.style.cursor = 'pointer';
+                    localStorage.removeItem('carts');
+                    window.location.href = '/invoice';
+                    {#console.error(err);#}
+                    {#alert(err.message);#}
+                    {#btn.disabled = false;#}
+                    {#btn.textContent = 'Proceed';#}
+                    {#btn.style.cursor = 'pointer';#}
                 }
             });
         });
