@@ -29,7 +29,7 @@
 
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required
-                           pattern="[a-zA-Z0-9._%+-]+@gmail\.com$"
+
                            title="Please enter a valid Gmail address">
 
                     <label for="phone">Phone Number</label>
@@ -45,80 +45,82 @@
     </div>
 
     <script>
-        let carts = JSON.parse(localStorage.getItem('carts')) || [];
-        const totalUSDSpan = document.getElementById('totalUSD');
-        const totalRielSpan = document.getElementById('totalRiel');
-        const EXCHANGE_RATE = 4000;
+        document.addEventListener('DOMContentLoaded', () => {
+            let carts = JSON.parse(localStorage.getItem('carts')) || [];
+            const totalUSDSpan = document.getElementById('totalUSD');
+            const totalRielSpan = document.getElementById('totalRiel');
+            const EXCHANGE_RATE = 4000;
 
-        function renderOrderSummary() {
-            const orderSummaryList = document.getElementById('orderSummary');
-            orderSummaryList.innerHTML = '';
-            let totalUSD = 0;
+            function renderOrderSummary() {
+                const orderSummaryList = document.getElementById('orderSummary');
+                orderSummaryList.innerHTML = '';
+                let totalUSD = 0;
 
-            if (carts.length === 0) {
-                orderSummaryList.innerHTML = '<p style="text-align:center; color:#555;">Your cart is empty</p>';
-                totalUSDSpan.textContent = '0.00';
-                totalRielSpan.textContent = '0';
-                return;
-            }
+                if (carts.length === 0) {
+                    orderSummaryList.innerHTML = '<p style="text-align:center; color:#555;">Your cart is empty</p>';
+                    totalUSDSpan.textContent = '0.00';
+                    totalRielSpan.textContent = '0';
+                    return;
+                }
 
-            carts.forEach(item => {
-                totalUSD += item.price * item.quantity;
-                const summaryItem = document.createElement('div');
-                summaryItem.className = 'summary-item';
-                summaryItem.innerHTML = `<span>${item.name} x${item.quantity}</span><span>$${(item.price * item.quantity).toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                })}</span>`;
-                orderSummaryList.appendChild(summaryItem);
-            });
-
-            totalUSDSpan.textContent = totalUSD.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-            totalRielSpan.textContent = Math.round(totalUSD * EXCHANGE_RATE).toLocaleString('en-US');
-        }
-
-        renderOrderSummary();
-
-        // AJAX form submission
-        document.getElementById('userForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const proceedBtn = this.querySelector('.proceed-btn');
-            if (proceedBtn.disabled) return;
-
-            proceedBtn.disabled = true;
-            proceedBtn.style.cursor = 'not-allowed';
-            proceedBtn.textContent = 'Processing...';
-
-            const formData = new FormData(this);
-            // Send cart as JSON string
-            formData.append('cart', JSON.stringify(carts));
-
-            try {
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData
+                carts.forEach(item => {
+                    totalUSD += item.price * item.quantity;
+                    const summaryItem = document.createElement('div');
+                    summaryItem.className = 'summary-item';
+                    summaryItem.innerHTML = `<span>${item.name} x${item.quantity}</span><span>$${(item.price * item.quantity).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}</span>`;
+                    orderSummaryList.appendChild(summaryItem);
                 });
 
-                if (response.ok) {
-                    localStorage.removeItem('carts');
-                    window.location.href = '/invoice';
-                } else {
-                    alert('Failed to submit order.');
+                totalUSDSpan.textContent = totalUSD.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                totalRielSpan.textContent = Math.round(totalUSD * EXCHANGE_RATE).toLocaleString('en-US');
+            }
+
+            renderOrderSummary();
+
+            // AJAX form submission
+            document.getElementById('userForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const proceedBtn = this.querySelector('.proceed-btn');
+                if (proceedBtn.disabled) return;
+
+                proceedBtn.disabled = true;
+                proceedBtn.style.cursor = 'not-allowed';
+                proceedBtn.textContent = 'Processing...';
+
+                const formData = new FormData(this);
+                // Send cart as JSON string
+                formData.append('cart', JSON.stringify(carts));
+
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        localStorage.removeItem('carts');
+                        window.location.href = '/invoice';
+                    } else {
+                        {#alert('Failed to submit order.');#}
+                        proceedBtn.disabled = false;
+                        proceedBtn.style.cursor = 'pointer';
+                        proceedBtn.textContent = 'Proceed';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    {#alert('Error submitting order.');#}
                     proceedBtn.disabled = false;
                     proceedBtn.style.cursor = 'pointer';
                     proceedBtn.textContent = 'Proceed';
                 }
-            } catch (err) {
-                console.error(err);
-                alert('Error submitting order.');
-                proceedBtn.disabled = false;
-                proceedBtn.style.cursor = 'pointer';
-                proceedBtn.textContent = 'Proceed';
-            }
+            });
         });
     </script>
 {% endblock %}
