@@ -20,6 +20,7 @@ from flask_jwt_extended import JWTManager
 # Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "super-secret-key")
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 for key in ["SECRET_KEY", "JWT_SECRET_KEY", "DATABASE_URL"]:
     if not os.getenv(key):

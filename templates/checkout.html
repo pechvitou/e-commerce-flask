@@ -99,21 +99,21 @@
                         localStorage.removeItem('carts');
                         window.location.href = '/invoice';
                     } else {
-                        localStorage.removeItem('carts');
-                        window.location.href = '/invoice';
+                        {#localStorage.removeItem('carts');#}
+                        {#window.location.href = '/invoice';#}
                         {#alert(text);  #}
-                        {#btn.disabled = false;#}
-                        {#btn.textContent = 'Proceed';#}
-                        {#btn.style.cursor = 'pointer';#}
+                        btn.disabled = false;
+                        btn.textContent = 'Proceed';
+                        btn.style.cursor = 'pointer';
                     }
                 } catch (err) {
                     {#localStorage.removeItem('carts');#}
                     {#window.location.href = '/invoice';#}
                     {#console.error(err);#}
                     {#alert(err.message);#}
-                    {#btn.disabled = false;#}
-                    {#btn.textContent = 'Proceed';#}
-                    {#btn.style.cursor = 'pointer';#}
+                    btn.disabled = false;
+                    btn.textContent = 'Proceed';
+                    btn.style.cursor = 'pointer';
                 }
             });
         });
