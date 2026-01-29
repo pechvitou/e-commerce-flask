@@ -45,7 +45,10 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('userForm');
+
+        if (form) {
+
             let carts = JSON.parse(localStorage.getItem('carts')) || [];
             const totalUSDSpan = document.getElementById('totalUSD');
             const totalRielSpan = document.getElementById('totalRiel');
@@ -57,7 +60,7 @@
                 let totalUSD = 0;
 
                 if (carts.length === 0) {
-                    orderSummaryList.innerHTML = '<p style="text-align:center; color:#555;">Your cart is empty</p>';
+                    orderSummaryList.innerHTML = '<p style="text-align:center">Your cart is empty</p>';
                     totalUSDSpan.textContent = '0.00';
                     totalRielSpan.textContent = '0';
                     return;
@@ -65,62 +68,52 @@
 
                 carts.forEach(item => {
                     totalUSD += item.price * item.quantity;
-                    const summaryItem = document.createElement('div');
-                    summaryItem.className = 'summary-item';
-                    summaryItem.innerHTML = `<span>${item.name} x${item.quantity}</span><span>$${(item.price * item.quantity).toLocaleString('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    })}</span>`;
-                    orderSummaryList.appendChild(summaryItem);
+                    const div = document.createElement('div');
+                    div.className = 'summary-item';
+                    div.innerHTML = `<span>${item.name} x${item.quantity}</span><span>$${(item.price * item.quantity).toFixed(2)}</span>`;
+                    orderSummaryList.appendChild(div);
                 });
 
-                totalUSDSpan.textContent = totalUSD.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-                totalRielSpan.textContent = Math.round(totalUSD * EXCHANGE_RATE).toLocaleString('en-US');
+                totalUSDSpan.textContent = totalUSD.toFixed(2);
+                totalRielSpan.textContent = Math.round(totalUSD * EXCHANGE_RATE);
             }
 
             renderOrderSummary();
 
-            // AJAX form submission
-            document.getElementById('userForm').addEventListener('submit', async function (e) {
+            form.addEventListener('submit', async function (e) {
                 e.preventDefault();
 
-                const proceedBtn = this.querySelector('.proceed-btn');
-                if (proceedBtn.disabled) return;
+                const btn = this.querySelector('.proceed-btn');
+                btn.disabled = true;
 
-                proceedBtn.disabled = true;
-                proceedBtn.style.cursor = 'not-allowed';
-                proceedBtn.textContent = 'Processing...';
-
-                const formData = new FormData(this);
-                // Send cart as JSON string
-                formData.append('cart', JSON.stringify(carts));
+                const data = new FormData(this);
+                data.append('cart', JSON.stringify(carts));
 
                 try {
-                    const response = await fetch(this.action, {
+                    const res = await fetch(this.action, {
                         method: 'POST',
-                        body: formData
+                        body: data
                     });
 
-                    if (response.ok) {
+                    const txt = await res.text();
+                    console.log(txt);
+
+                    if (res.ok) {
                         localStorage.removeItem('carts');
-                        window.location.href = '/invoice';
+                        window.location = '/invoice';
                     } else {
-                        {#alert('Failed to submit order.');#}
-                        proceedBtn.disabled = false;
-                        proceedBtn.style.cursor = 'pointer';
-                        proceedBtn.textContent = 'Proceed';
+                        alert(txt);
+                        btn.disabled = false;
                     }
+
                 } catch (err) {
                     console.error(err);
-                    {#alert('Error submitting order.');#}
-                    proceedBtn.disabled = false;
-                    proceedBtn.style.cursor = 'pointer';
-                    proceedBtn.textContent = 'Proceed';
+                    alert(err.message);
+                    btn.disabled = false;
                 }
             });
-        });
+
+        }
     </script>
+
 {% endblock %}
