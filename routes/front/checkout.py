@@ -111,83 +111,73 @@ def send_order_notification(name, email, phone, address, cart, total_usd, total_
     except Exception as e:
         print("Email error:", e)
 
+
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        phone = request.form.get('phone')
-        address = request.form.get('address')
-
-        cart_json = request.form.get('cart')
         try:
-            cart = json.loads(cart_json) if cart_json else []
-        except Exception:
-            cart = []
+            name = request.form.get('name')
+            email = request.form.get('email')
+            phone = request.form.get('phone')
+            address = request.form.get('address')
 
-        # Calculate totals
-        total_usd = sum(item['price'] * item['quantity'] for item in cart)
-        total_riel = total_usd * EXCHANGE_RATE
+            cart_json = request.form.get('cart')
+            try:
+                cart = json.loads(cart_json) if cart_json else []
+            except Exception:
+                cart = []
 
-        # ---------------------------------------------------
-        # 1. Create Order
-        # ---------------------------------------------------
-        order = Order(
-            user_id=1,       # change if you have login system
-            customer_id=1,   # change to actual customer
-            status='pending'
-        )
+            total_usd = sum(item['price'] * item['quantity'] for item in cart)
+            total_riel = total_usd * EXCHANGE_RATE
 
-        db.session.add(order)
-        db.session.flush()  # <-- get order.id before commit
+            # -------------------------
+            # Database operations
+            # -------------------------
+            order = Order(user_id=1, customer_id=1, status='pending')
+            db.session.add(order)
+            db.session.flush()
 
-        # ---------------------------------------------------
-        # 2. Create Order Items
-        # ---------------------------------------------------
-        for item in cart:
-            product = Product.query.get(item['id'])
+            for item in cart:
+                product = Product.query.get(item['id'])
+                if not product:
+                    continue
 
-            if not product:
-                continue
+                qty = int(item['quantity'])
+                price = float(item['price'])
+                total = price * qty
 
-            qty = int(item['quantity'])
-            price = float(item['price'])
-            total = price * qty
+                order_item = OrderItem(
+                    order_id=order.id,
+                    product_id=product.id,
+                    price=price,
+                    qty=qty,
+                    total=total
+                )
+                db.session.add(order_item)
 
-            order_item = OrderItem(
-                order_id=order.id,
-                product_id=product.id,
-                price=price,
-                qty=qty,
-                total=total
-            )
+                product.stock = (product.stock or 0) - qty
 
-            db.session.add(order_item)
+            db.session.commit()
 
-            # Optional: reduce stock
-            product.stock = product.stock - qty
+            session['invoice'] = {
+                "name": name,
+                "email": email,
+                "phone": phone,
+                "address": address,
+                "cart": cart,
+                "total_usd": total_usd,
+                "total_riel": total_riel,
+                "order_id": order.id
+            }
 
-        # ---------------------------------------------------
-        # 3. Save to database
-        # ---------------------------------------------------
-        db.session.commit()
+            send_order_notification(name, email, phone, address, cart, total_usd, total_riel)
 
-        # ---------------------------------------------------
-        # 4. Store invoice in session
-        # ---------------------------------------------------
-        session['invoice'] = {
-            "name": name,
-            "email": email,
-            "phone": phone,
-            "address": address,
-            "cart": cart,
-            "total_usd": total_usd,
-            "total_riel": total_riel,
-            "order_id": order.id
-        }
+            return redirect(url_for('invoice'))
 
-        send_order_notification(name, email, phone, address, cart, total_usd, total_riel)
-
-        return redirect(url_for('invoice'))
+        except Exception as e:
+            # <<< THIS IS KEY: RETURN SOMETHING, DON'T CRASH
+            import traceback
+            traceback.print_exc()  # prints full error in terminal
+            return f"Server error: {str(e)}", 500
 
     return render_template('checkout.html')
