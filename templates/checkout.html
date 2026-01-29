@@ -45,11 +45,11 @@
     </div>
 
     <script>
-        const form = document.getElementById('userForm');
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('userForm');
+            if (!form) return;
 
-        if (form) {
-
-            let carts = JSON.parse(localStorage.getItem('carts')) || [];
+            let carts = JSON.parse(localStorage.getItem('carts') || '[]');
             const totalUSDSpan = document.getElementById('totalUSD');
             const totalRielSpan = document.getElementById('totalRiel');
             const EXCHANGE_RATE = 4000;
@@ -60,7 +60,7 @@
                 let totalUSD = 0;
 
                 if (carts.length === 0) {
-                    orderSummaryList.innerHTML = '<p style="text-align:center">Your cart is empty</p>';
+                    orderSummaryList.innerHTML = '<p style="text-align:center; color:#555;">Your cart is empty</p>';
                     totalUSDSpan.textContent = '0.00';
                     totalRielSpan.textContent = '0';
                     return;
@@ -68,10 +68,10 @@
 
                 carts.forEach(item => {
                     totalUSD += item.price * item.quantity;
-                    const div = document.createElement('div');
-                    div.className = 'summary-item';
-                    div.innerHTML = `<span>${item.name} x${item.quantity}</span><span>$${(item.price * item.quantity).toFixed(2)}</span>`;
-                    orderSummaryList.appendChild(div);
+                    const summaryItem = document.createElement('div');
+                    summaryItem.className = 'summary-item';
+                    summaryItem.innerHTML = `<span>${item.name} x${item.quantity}</span><span>$${(item.price * item.quantity).toFixed(2)}</span>`;
+                    orderSummaryList.appendChild(summaryItem);
                 });
 
                 totalUSDSpan.textContent = totalUSD.toFixed(2);
@@ -82,38 +82,37 @@
 
             form.addEventListener('submit', async function (e) {
                 e.preventDefault();
-
                 const btn = this.querySelector('.proceed-btn');
                 btn.disabled = true;
+                btn.textContent = 'Processing...';
+                btn.style.cursor = 'not-allowed';
 
                 const data = new FormData(this);
                 data.append('cart', JSON.stringify(carts));
 
                 try {
-                    const res = await fetch(this.action, {
-                        method: 'POST',
-                        body: data
-                    });
-
-                    const txt = await res.text();
-                    console.log(txt);
+                    const res = await fetch(this.action, {method: 'POST', body: data});
+                    const text = await res.text();
+                    console.log(text);
 
                     if (res.ok) {
                         localStorage.removeItem('carts');
-                        window.location = '/invoice';
+                        window.location.href = '/invoice';
                     } else {
-                        alert(txt);
+                        alert(text);  // now you will see server error
                         btn.disabled = false;
+                        btn.textContent = 'Proceed';
+                        btn.style.cursor = 'pointer';
                     }
-
                 } catch (err) {
                     console.error(err);
                     alert(err.message);
                     btn.disabled = false;
+                    btn.textContent = 'Proceed';
+                    btn.style.cursor = 'pointer';
                 }
             });
-
-        }
+        });
     </script>
 
 {% endblock %}
