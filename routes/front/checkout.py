@@ -135,7 +135,7 @@ def checkout():
             # -------------------------
             order = Order(user_id=1, customer_id=1, status='pending')
             db.session.add(order)
-            db.session.flush()
+            db.session.flush()  # get order.id
 
             for item in cart:
                 product = Product.query.get(item['id'])
@@ -155,29 +155,22 @@ def checkout():
                 )
                 db.session.add(order_item)
 
+                # Optional: update stock
                 product.stock = (product.stock or 0) - qty
 
             db.session.commit()
 
-            session['invoice'] = {
-                "name": name,
-                "email": email,
-                "phone": phone,
-                "address": address,
-                "cart": cart,
-                "total_usd": total_usd,
-                "total_riel": total_riel,
-                "order_id": order.id
-            }
+            # ✅ Only store order_id in session
+            session['invoice_order_id'] = order.id
 
+            # Send Telegram/email notification
             send_order_notification(name, email, phone, address, cart, total_usd, total_riel)
 
             return redirect(url_for('invoice'))
 
         except Exception as e:
-            # <<< THIS IS KEY: RETURN SOMETHING, DON'T CRASH
             import traceback
-            traceback.print_exc()  # prints full error in terminal
+            traceback.print_exc()
             return f"Server error: {str(e)}", 500
 
     return render_template('checkout.html')
